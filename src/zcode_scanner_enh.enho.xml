@@ -1,0 +1,1403 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_ENHO" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <TOOL>HOOK_IMPL</TOOL>
+   <SHORTTEXT>Enhanced Code Scanner</SHORTTEXT>
+   <ORIGINAL_OBJECT>
+    <PGMID>R3TR</PGMID>
+    <ORG_OBJ_TYPE>PROG</ORG_OBJ_TYPE>
+    <ORG_OBJ_NAME>AFX_CODE_SCANNER</ORG_OBJ_NAME>
+    <ORG_MAIN_TYPE>PROG</ORG_MAIN_TYPE>
+    <ORG_MAIN_NAME>AFX_CODE_SCANNER</ORG_MAIN_NAME>
+    <PROGRAMNAME>AFX_CODE_SCANNER</PROGRAMNAME>
+   </ORIGINAL_OBJECT>
+   <ENHANCEMENTS>
+    <ENH_HOOK_IMPL>
+     <PROGRAMNAME>AFX_CODE_SCANNER</PROGRAMNAME>
+     <EXTID>1</EXTID>
+     <ID>1</ID>
+     <ENHMODE>S</ENHMODE>
+     <FULL_NAME>\PR:AFX_CODE_SCANNER\FO:SCAN_DEVC\SE:END\EI</FULL_NAME>
+     <SOURCE>
+      <item>perform enhanced_scan USING u_devc u_index u_count u_cnt_line.</item>
+     </SOURCE>
+    </ENH_HOOK_IMPL>
+    <ENH_HOOK_IMPL>
+     <PROGRAMNAME>AFX_CODE_SCANNER</PROGRAMNAME>
+     <EXTID>2</EXTID>
+     <ID>2</ID>
+     <ENHMODE>S</ENHMODE>
+     <FULL_NAME>\PR:AFX_CODE_SCANNER\IC:AFX_CODE_SCANNER\SE:END\EI</FULL_NAME>
+     <SOURCE>
+      <item>SELECTION-SCREEN begin of block z1 with FRAME TITLE ll_title.</item>
+      <item>PARAMETERS: p_enh as CHECKBOX DEFAULT con_true,</item>
+      <item>p_wdy as CHECKBOX DEFAULT con_true,</item>
+      <item>p_bsp as CHECKBOX DEFAULT con_true,</item>
+      <item>p_frm as CHECKBOX DEFAULT con_true.</item>
+      <item>SELECTION-SCREEN end of block z1.</item>
+      <item/>
+      <item/>
+      <item>INITIALIZATION.</item>
+      <item>ll_title = &apos;Extended Scan Options&apos;.</item>
+      <item>%_p_enh_%_app_%-text = &apos;Enhancements&apos;.</item>
+      <item>%_p_wdy_%_app_%-text = &apos;Web Dynpro Components&apos;.</item>
+      <item>%_p_bsp_%_app_%-text = &apos;BSP Applications&apos;.</item>
+      <item>%_p_frm_%_app_%-text = &apos;Adobe/Smart forms(May be slow)&apos;.</item>
+      <item/>
+      <item>&quot;default typical namespace for customer and output routines</item>
+      <item>s_devc-low = &apos;Z*&apos;.</item>
+      <item>APPEND s_devc.</item>
+      <item/>
+      <item>s_devc-option = &apos;EQ&apos;.</item>
+      <item>s_devc-low = &apos;VN&apos;.</item>
+      <item>append s_devc.</item>
+      <item/>
+      <item>s_devc-low = &apos;VKON&apos;.</item>
+      <item>append s_devc.</item>
+      <item/>
+      <item/>
+      <item>*&amp;---------------------------------------------------------------------*</item>
+      <item>*&amp;      Form  scan_devc_enh</item>
+      <item>*&amp;---------------------------------------------------------------------*</item>
+      <item>*       text</item>
+      <item>*----------------------------------------------------------------------*</item>
+      <item>*      --&gt;U_DEVC     text</item>
+      <item>*      --&gt;U_INDEX    text</item>
+      <item>*      --&gt;U_COUNT    text</item>
+      <item>*      --&gt;U_CNT_LINE text</item>
+      <item>*----------------------------------------------------------------------*</item>
+      <item>FORM scan_devc_enh  USING u_devc     TYPE devclass</item>
+      <item>u_index    TYPE i</item>
+      <item>u_count    TYPE i</item>
+      <item>u_cnt_line TYPE n.</item>
+      <item>DATA: l_tab_tadir     TYPE TABLE OF tadir,</item>
+      <item>l_str_tadir     TYPE tadir,</item>
+      <item>l_cnt           TYPE i,</item>
+      <item>l_cnt_str(10)   TYPE c,</item>
+      <item>l_idx_devc(10)  TYPE c,</item>
+      <item>l_cnt_devc(10)  TYPE c,</item>
+      <item>l_aux_devc(20)  TYPE c,</item>
+      <item>l_percentage    TYPE p,</item>
+      <item>l_tabix_str(10) TYPE c,</item>
+      <item>l_rep_name      TYPE sobj_name,</item>
+      <item>l_tab_source    TYPE t_tab_long_lines,    &quot;CB</item>
+      <item>l_text          TYPE itex132.</item>
+      <item/>
+      <item>* Initialization</item>
+      <item>l_idx_devc = u_index.</item>
+      <item>l_cnt_devc = u_count.</item>
+      <item>CONCATENATE l_idx_devc &apos;/&apos; l_cnt_devc INTO l_aux_devc.</item>
+      <item>CONDENSE l_aux_devc.</item>
+      <item/>
+      <item>* Get programs of current package</item>
+      <item>REFRESH l_tab_tadir.</item>
+      <item>IF u_devc &lt;&gt; c_devc_tmp.</item>
+      <item>SELECT * FROM tadir INTO TABLE l_tab_tadir</item>
+      <item>WHERE pgmid    = &apos;R3TR&apos; AND</item>
+      <item>object   = &apos;ENHO&apos; AND</item>
+      <item>devclass = u_devc AND</item>
+      <item>obj_name IN s_rest.                       &quot;#EC CI_SGLSELECT</item>
+      <item/>
+      <item>ELSE.</item>
+      <item>SELECT * FROM tadir INTO TABLE l_tab_tadir</item>
+      <item>WHERE pgmid    = &apos;R3TR&apos; AND</item>
+      <item>object   = &apos;ENHO&apos; AND</item>
+      <item>devclass = u_devc AND</item>
+      <item>author   = sy-uname AND</item>
+      <item>obj_name IN s_rest.                       &quot;#EC CI_SGLSELECT</item>
+      <item>ENDIF.</item>
+      <item/>
+      <item>* Ignore invalid TADIR entries.</item>
+      <item>DELETE l_tab_tadir WHERE obj_name IS INITIAL.</item>
+      <item/>
+      <item>* Write count of programs into list</item>
+      <item>DESCRIBE TABLE l_tab_tadir LINES l_cnt.</item>
+      <item>IF l_cnt = 0.</item>
+      <item>**    FORMAT COLOR COL_NORMAL INTENSIFIED ON.</item>
+      <item>**    WRITE: / &apos;Keine Programme in Paket&apos;,</item>
+      <item>**             u_devc, &apos;gefunden&apos;.</item>
+      <item>EXIT.</item>
+      <item>ENDIF.</item>
+      <item>**  FORMAT COLOR COL_NORMAL INTENSIFIED ON.</item>
+      <item>**  WRITE: / &apos;Anzahl gefundener Programme in Paket&apos;,</item>
+      <item>**           u_devc, &apos;:&apos;, l_cnt.</item>
+      <item>**  SKIP.</item>
+      <item/>
+      <item>* Process all program sources</item>
+      <item>l_cnt_str = l_cnt.</item>
+      <item>CONDENSE l_cnt_str.</item>
+      <item>LOOP AT l_tab_tadir INTO l_str_tadir.</item>
+      <item>l_tabix_str = sy-tabix.</item>
+      <item>CONDENSE l_tabix_str.</item>
+      <item/>
+      <item>*   Display progress indicator</item>
+      <item>l_percentage = 100 * ( sy-tabix / l_cnt ).</item>
+      <item>CONCATENATE &apos;Scanne Paket&apos;(008) u_devc l_aux_devc</item>
+      <item>&apos;(&apos; &apos;Enh&apos;(015) l_tabix_str &apos;von&apos;(010) l_cnt_str &apos;)&apos;</item>
+      <item>INTO l_text SEPARATED BY space.</item>
+      <item>CALL FUNCTION &apos;SAPGUI_PROGRESS_INDICATOR&apos;</item>
+      <item>EXPORTING</item>
+      <item>percentage = l_percentage</item>
+      <item>text       = l_text.</item>
+      <item/>
+      <item>*   Read program source and search for specified strings</item>
+      <item>*    write: / l_str_tadir-obj_name.</item>
+      <item>*    l_rep_name = l_str_tadir-obj_name.</item>
+      <item>SELECT SINGLE enhinclude</item>
+      <item>INTO l_rep_name</item>
+      <item>FROM enhincinx</item>
+      <item>WHERE enhname = l_str_tadir-obj_name.</item>
+      <item/>
+      <item>CHECK sy-subrc = 0.</item>
+      <item/>
+      <item>REFRESH l_tab_source.</item>
+      <item>READ REPORT l_rep_name INTO l_tab_source.</item>
+      <item>IF sy-subrc = 0.</item>
+      <item>PERFORM scan_prog USING    u_devc</item>
+      <item>l_rep_name</item>
+      <item>u_cnt_line</item>
+      <item>CHANGING l_tab_source.     &quot;CB</item>
+      <item/>
+      <item>**    ELSE.</item>
+      <item>**      FORMAT COLOR COL_NEGATIVE.</item>
+      <item>**      WRITE: / &apos;Report&apos;, l_rep_name, &apos;nicht gefunden!&apos;.</item>
+      <item>ENDIF.</item>
+      <item/>
+      <item>ENDLOOP.</item>
+      <item/>
+      <item/>
+      <item>ENDFORM.                    &quot;scan_devc_enh</item>
+      <item>*&amp;---------------------------------------------------------------------*</item>
+      <item>*&amp;      Form  scan_devc_wdy</item>
+      <item>*&amp;---------------------------------------------------------------------*</item>
+      <item>*       text</item>
+      <item>*----------------------------------------------------------------------*</item>
+      <item>*      --&gt;U_DEVC     text</item>
+      <item>*      --&gt;U_INDEX    text</item>
+      <item>*      --&gt;U_COUNT    text</item>
+      <item>*      --&gt;U_CNT_LINE text</item>
+      <item>*----------------------------------------------------------------------*</item>
+      <item>FORM scan_devc_wdy  USING u_devc     TYPE devclass</item>
+      <item>u_index    TYPE i</item>
+      <item>u_count    TYPE i</item>
+      <item>u_cnt_line TYPE n.</item>
+      <item/>
+      <item>DATA: l_tab_tadir     TYPE TABLE OF tadir,</item>
+      <item>l_str_tadir     TYPE tadir,</item>
+      <item>l_cnt           TYPE i,</item>
+      <item>l_cnt_str(10)   TYPE c,</item>
+      <item>l_idx_devc(10)  TYPE c,</item>
+      <item>l_cnt_devc(10)  TYPE c,</item>
+      <item>l_aux_devc(20)  TYPE c,</item>
+      <item>l_percentage    TYPE p,</item>
+      <item>l_tabix_str(10) TYPE c,</item>
+      <item>l_rep_name      TYPE sobj_name,</item>
+      <item>l_tab_source    TYPE t_tab_long_lines,    &quot;CB</item>
+      <item>l_text          TYPE itex132.</item>
+      <item/>
+      <item>* Initialization</item>
+      <item>l_idx_devc = u_index.</item>
+      <item>l_cnt_devc = u_count.</item>
+      <item>CONCATENATE l_idx_devc &apos;/&apos; l_cnt_devc INTO l_aux_devc.</item>
+      <item>CONDENSE l_aux_devc.</item>
+      <item/>
+      <item>* Get programs of current package</item>
+      <item>REFRESH l_tab_tadir.</item>
+      <item>IF u_devc &lt;&gt; c_devc_tmp.</item>
+      <item>SELECT * FROM tadir INTO TABLE l_tab_tadir</item>
+      <item>WHERE pgmid    = &apos;R3TR&apos; AND</item>
+      <item>object   = &apos;WDYN&apos; AND</item>
+      <item>devclass = u_devc AND</item>
+      <item>obj_name IN s_rest.                       &quot;#EC CI_SGLSELECT</item>
+      <item/>
+      <item>ELSE.</item>
+      <item>SELECT * FROM tadir INTO TABLE l_tab_tadir</item>
+      <item>WHERE pgmid    = &apos;R3TR&apos; AND</item>
+      <item>object   = &apos;WDYN&apos; AND</item>
+      <item>devclass = u_devc AND</item>
+      <item>author   = sy-uname AND</item>
+      <item>obj_name IN s_rest.                       &quot;#EC CI_SGLSELECT</item>
+      <item>ENDIF.</item>
+      <item/>
+      <item>&quot;if we&apos;re also looking at enhancements</item>
+      <item>IF p_enh = con_true.</item>
+      <item>IF u_devc &lt;&gt; c_devc_tmp.</item>
+      <item>SELECT tadir~pgmid</item>
+      <item>tadir~object</item>
+      <item>enhobj~main_name AS obj_name</item>
+      <item>tadir~korrnum</item>
+      <item>tadir~srcsystem</item>
+      <item>tadir~author</item>
+      <item>tadir~srcdep</item>
+      <item>tadir~devclass</item>
+      <item>tadir~genflag</item>
+      <item>tadir~edtflag</item>
+      <item>tadir~cproject</item>
+      <item>tadir~masterlang</item>
+      <item>tadir~versid</item>
+      <item>tadir~paknocheck</item>
+      <item>tadir~objstablty</item>
+      <item>tadir~component</item>
+      <item>tadir~crelease</item>
+      <item>tadir~delflag</item>
+      <item>tadir~translttxt</item>
+      <item>FROM tadir</item>
+      <item>INNER JOIN enhobj</item>
+      <item>ON tadir~obj_name = enhobj~enhname</item>
+      <item>APPENDING CORRESPONDING FIELDS OF TABLE l_tab_tadir</item>
+      <item>WHERE tadir~pgmid    = &apos;R3TR&apos; AND</item>
+      <item>tadir~object   = &apos;ENHO&apos; AND</item>
+      <item>tadir~devclass = u_devc AND</item>
+      <item>tadir~obj_name IN s_rest AND             &quot;#EC CI_SGLSELECT</item>
+      <item>enhobj~main_type = &apos;WDYN&apos;.</item>
+      <item/>
+      <item>ELSE.</item>
+      <item>SELECT tadir~pgmid</item>
+      <item>tadir~object</item>
+      <item>enhobj~main_name AS obj_name</item>
+      <item>tadir~korrnum</item>
+      <item>tadir~srcsystem</item>
+      <item>tadir~author</item>
+      <item>tadir~srcdep</item>
+      <item>tadir~devclass</item>
+      <item>tadir~genflag</item>
+      <item>tadir~edtflag</item>
+      <item>tadir~cproject</item>
+      <item>tadir~masterlang</item>
+      <item>tadir~versid</item>
+      <item>tadir~paknocheck</item>
+      <item>tadir~objstablty</item>
+      <item>tadir~component</item>
+      <item>tadir~crelease</item>
+      <item>tadir~delflag</item>
+      <item>tadir~translttxt</item>
+      <item>FROM tadir</item>
+      <item>INNER JOIN enhobj</item>
+      <item>ON tadir~obj_name = enhobj~obj_name</item>
+      <item>APPENDING CORRESPONDING FIELDS OF TABLE l_tab_tadir</item>
+      <item>WHERE tadir~pgmid    = &apos;R3TR&apos; AND</item>
+      <item>tadir~object   = &apos;ENHO&apos; AND</item>
+      <item>tadir~devclass = u_devc AND</item>
+      <item>tadir~author   = sy-uname AND</item>
+      <item>tadir~obj_name IN s_rest AND             &quot;#EC CI_SGLSELECT</item>
+      <item>enhobj~main_type = &apos;WDYN&apos;.</item>
+      <item>ENDIF.</item>
+      <item/>
+      <item/>
+      <item>SORT l_tab_tadir BY pgmid object obj_name.</item>
+      <item>DELETE ADJACENT DUPLICATES FROM l_tab_tadir</item>
+      <item>COMPARING pgmid object obj_name.</item>
+      <item/>
+      <item>ENDIF.</item>
+      <item/>
+      <item>* Ignore invalid TADIR entries.</item>
+      <item>DELETE l_tab_tadir WHERE obj_name IS INITIAL.</item>
+      <item/>
+      <item>* Write count of programs into list</item>
+      <item>DESCRIBE TABLE l_tab_tadir LINES l_cnt.</item>
+      <item>IF l_cnt = 0.</item>
+      <item>**    FORMAT COLOR COL_NORMAL INTENSIFIED ON.</item>
+      <item>**    WRITE: / &apos;Keine Programme in Paket&apos;,</item>
+      <item>**             u_devc, &apos;gefunden&apos;.</item>
+      <item>EXIT.</item>
+      <item>ENDIF.</item>
+      <item>**  FORMAT COLOR COL_NORMAL INTENSIFIED ON.</item>
+      <item>**  WRITE: / &apos;Anzahl gefundener Programme in Paket&apos;,</item>
+      <item>**           u_devc, &apos;:&apos;, l_cnt.</item>
+      <item>**  SKIP.</item>
+      <item/>
+      <item>* Process all program sources</item>
+      <item>l_cnt_str = l_cnt.</item>
+      <item>CONDENSE l_cnt_str.</item>
+      <item>LOOP AT l_tab_tadir INTO l_str_tadir.</item>
+      <item>l_tabix_str = sy-tabix.</item>
+      <item>CONDENSE l_tabix_str.</item>
+      <item/>
+      <item>*   Display progress indicator</item>
+      <item>l_percentage = 100 * ( sy-tabix / l_cnt ).</item>
+      <item>CONCATENATE &apos;Scanne Paket&apos;(008) u_devc l_aux_devc</item>
+      <item>&apos;(&apos; &apos;WDA&apos;(016) l_tabix_str &apos;von&apos;(010) l_cnt_str &apos;)&apos;</item>
+      <item>INTO l_text SEPARATED BY space.</item>
+      <item>CALL FUNCTION &apos;SAPGUI_PROGRESS_INDICATOR&apos;</item>
+      <item>EXPORTING</item>
+      <item>percentage = l_percentage</item>
+      <item>text       = l_text.</item>
+      <item/>
+      <item>DATA: classname TYPE seoclsname.</item>
+      <item>DATA: compname TYPE wdy_component_name.</item>
+      <item>DATA: includename(35) TYPE c.</item>
+      <item>compname = l_str_tadir-obj_name.</item>
+      <item/>
+      <item>*   Read program source and search for specified strings</item>
+      <item>*    write: / l_str_tadir-obj_name.</item>
+      <item>*    l_rep_name = l_str_tadir-obj_name.</item>
+      <item>cl_wdy_wb_naming_service=&gt;get_classname_for_component(</item>
+      <item>EXPORTING</item>
+      <item>p_component        = compname</item>
+      <item>RECEIVING</item>
+      <item>p_classname        = classname</item>
+      <item>EXCEPTIONS</item>
+      <item>no_generation_info = 1</item>
+      <item>OTHERS             = 2 ).</item>
+      <item/>
+      <item>CHECK sy-subrc = 0.</item>
+      <item/>
+      <item>CONCATENATE classname &apos;==ccimp&apos; INTO includename.</item>
+      <item>CONDENSE classname NO-GAPS.</item>
+      <item/>
+      <item>DATA: l_tab_includes LIKE l_tab_source.</item>
+      <item>FIELD-SYMBOLS: &lt;includes&gt; LIKE LINE OF l_tab_includes.</item>
+      <item>READ REPORT includename INTO l_tab_includes.</item>
+      <item>DELETE l_tab_includes WHERE table_line(7) &lt;&gt; &apos;INCLUDE&apos;.</item>
+      <item>CHECK l_tab_includes[] IS NOT INITIAL.</item>
+      <item/>
+      <item>LOOP AT l_tab_includes ASSIGNING &lt;includes&gt;.</item>
+      <item>REFRESH l_tab_source.</item>
+      <item/>
+      <item>l_rep_name = &lt;includes&gt;+8(30).</item>
+      <item/>
+      <item>READ REPORT l_rep_name INTO l_tab_source.</item>
+      <item>IF sy-subrc = 0.</item>
+      <item>PERFORM scan_prog USING    u_devc</item>
+      <item>l_rep_name</item>
+      <item>u_cnt_line</item>
+      <item>CHANGING l_tab_source.     &quot;CB</item>
+      <item/>
+      <item>**    ELSE.</item>
+      <item>**      FORMAT COLOR COL_NEGATIVE.</item>
+      <item>**      WRITE: / &apos;Report&apos;, l_rep_name, &apos;nicht gefunden!&apos;.</item>
+      <item>ENDIF.</item>
+      <item>ENDLOOP.</item>
+      <item>ENDLOOP.</item>
+      <item>ENDFORM.                    &quot;scan_devc_wdy</item>
+      <item>FORM scan_devc_bsp USING   u_devc     TYPE devclass</item>
+      <item>u_index    TYPE i</item>
+      <item>u_count    TYPE i</item>
+      <item>u_cnt_line TYPE n.</item>
+      <item>DATA: l_tab_tadir     TYPE TABLE OF tadir,</item>
+      <item>l_str_tadir     TYPE tadir,</item>
+      <item>l_str_e071      TYPE e071,</item>
+      <item>l_cnt           TYPE i,</item>
+      <item>l_cnt_str(10)   TYPE c,</item>
+      <item>l_idx_devc(10)  TYPE c,</item>
+      <item>l_cnt_devc(10)  TYPE c,</item>
+      <item>l_aux_devc(20)  TYPE c,</item>
+      <item>l_percentage    TYPE p,</item>
+      <item>l_tabix_str(10) TYPE c,</item>
+      <item>l_rep_name      TYPE sobj_name,</item>
+      <item>l_tab_source    TYPE TABLE OF t_abapsource_long,</item>
+      <item>l_text          TYPE itex132,</item>
+      <item>l_tab_trdir     TYPE STANDARD TABLE OF trdir,</item>
+      <item>l_str_trdir     LIKE LINE OF l_tab_trdir,</item>
+      <item>l_tab_selopt    TYPE STANDARD TABLE OF rsdsselopt,</item>
+      <item>l_str_selopt    LIKE LINE OF l_tab_selopt,</item>
+      <item>lt_pages        TYPE o2pagelist,</item>
+      <item>bsp_app_name    TYPE o2applname,</item>
+      <item>ls_pagekey      TYPE o2pagkey,</item>
+      <item>imp_class       TYPE seoclsname.</item>
+      <item/>
+      <item/>
+      <item>* Initialization</item>
+      <item>l_idx_devc = u_index.</item>
+      <item>l_cnt_devc = u_count.</item>
+      <item>CONCATENATE l_idx_devc &apos;/&apos; l_cnt_devc INTO l_aux_devc.</item>
+      <item>CONDENSE l_aux_devc.</item>
+      <item/>
+      <item>* Get classes of current package</item>
+      <item>REFRESH l_tab_tadir.</item>
+      <item>IF u_devc &lt;&gt; c_devc_tmp.</item>
+      <item>SELECT * FROM tadir INTO TABLE l_tab_tadir</item>
+      <item>WHERE pgmid    = &apos;R3TR&apos; AND</item>
+      <item>object   = &apos;WAPA&apos; AND</item>
+      <item>devclass = u_devc AND</item>
+      <item>obj_name IN s_rest.                       &quot;#EC CI_SGLSELECT</item>
+      <item>ELSE.</item>
+      <item>SELECT * FROM tadir INTO TABLE l_tab_tadir</item>
+      <item>WHERE pgmid    = &apos;R3TR&apos; AND</item>
+      <item>object   = &apos;WAPA&apos; AND</item>
+      <item>devclass = u_devc AND</item>
+      <item>author   = sy-uname AND</item>
+      <item>obj_name IN s_rest.                       &quot;#EC CI_SGLSELECT</item>
+      <item>ENDIF.</item>
+      <item/>
+      <item>* Ignore invalid TADIR entries.</item>
+      <item>DELETE l_tab_tadir WHERE obj_name IS INITIAL.</item>
+      <item/>
+      <item>* Write count of function pools into list</item>
+      <item>DESCRIBE TABLE l_tab_tadir LINES l_cnt.</item>
+      <item>IF l_cnt = 0.</item>
+      <item>*    FORMAT COLOR COL_NORMAL INTENSIFIED ON.</item>
+      <item>*    WRITE: / &apos;Keine Klassen in Entwicklungsklasse&apos;,</item>
+      <item>*             u_devc, &apos;gefunden&apos;.</item>
+      <item>*    EXIT.</item>
+      <item>ENDIF.</item>
+      <item>*  SKIP.</item>
+      <item>*  FORMAT COLOR COL_NORMAL INTENSIFIED ON.</item>
+      <item>*  WRITE: / &apos;Anzahl gefundener Klassen in Entwicklungsklasse&apos;,</item>
+      <item>*           u_devc, &apos;:&apos;, l_cnt.</item>
+      <item>*  SKIP.</item>
+      <item/>
+      <item>* Process all function pools</item>
+      <item>l_cnt_str = l_cnt.</item>
+      <item>CONDENSE l_cnt_str.</item>
+      <item>LOOP AT l_tab_tadir INTO l_str_tadir.</item>
+      <item>l_tabix_str = sy-tabix.</item>
+      <item>CONDENSE l_tabix_str.</item>
+      <item/>
+      <item>*   Display progress indicator</item>
+      <item>l_percentage = 100 * ( sy-tabix / l_cnt ).</item>
+      <item>CONCATENATE &apos;Scanne Paket&apos;(008) u_devc l_aux_devc</item>
+      <item>&apos;(&apos; &apos;Klasse&apos;(012) l_tabix_str &apos;von&apos;(010) l_cnt_str &apos;)&apos;</item>
+      <item>INTO l_text SEPARATED BY space.</item>
+      <item>CALL FUNCTION &apos;SAPGUI_PROGRESS_INDICATOR&apos;</item>
+      <item>EXPORTING</item>
+      <item>percentage = l_percentage</item>
+      <item>text       = l_text.</item>
+      <item/>
+      <item/>
+      <item>bsp_app_name = l_str_tadir-obj_name.</item>
+      <item>cl_o2_api_pages=&gt;get_all_pages(</item>
+      <item>EXPORTING</item>
+      <item>p_applname     = bsp_app_name</item>
+      <item>p_version      = so2_version_active</item>
+      <item>IMPORTING</item>
+      <item>p_pages        = lt_pages</item>
+      <item>).</item>
+      <item/>
+      <item/>
+      <item>* get includes for current class</item>
+      <item>REFRESH l_tab_selopt.</item>
+      <item/>
+      <item>LOOP AT lt_pages ASSIGNING FIELD-SYMBOL(&lt;page&gt;).</item>
+      <item/>
+      <item>REFRESH l_tab_selopt.</item>
+      <item>l_str_selopt-sign = &apos;I&apos;.</item>
+      <item>l_str_selopt-option = &apos;CP&apos;.</item>
+      <item>CONCATENATE &lt;page&gt;-implclass &apos;*&apos; INTO l_str_selopt-low.</item>
+      <item>APPEND l_str_selopt TO l_tab_selopt.</item>
+      <item/>
+      <item>SELECT * FROM trdir APPENDING TABLE l_tab_trdir</item>
+      <item>WHERE name IN l_tab_selopt.           &quot;#EC CI_SGLSELECT</item>
+      <item/>
+      <item>ENDLOOP.</item>
+      <item/>
+      <item>LOOP AT l_tab_trdir INTO l_str_trdir.</item>
+      <item>l_rep_name = l_str_e071-obj_name.</item>
+      <item>REFRESH l_tab_source.</item>
+      <item>l_rep_name = l_str_trdir-name.</item>
+      <item>READ REPORT l_rep_name INTO l_tab_source.</item>
+      <item/>
+      <item>IF sy-subrc = 0.</item>
+      <item>PERFORM scan_prog USING    u_devc</item>
+      <item>l_rep_name</item>
+      <item>u_cnt_line</item>
+      <item>CHANGING l_tab_source.     &quot;CB</item>
+      <item>ELSE.</item>
+      <item>FORMAT COLOR COL_NEGATIVE.</item>
+      <item>WRITE: / &apos;Report&apos;(009), l_rep_name, &apos;nicht gefunden!&apos;(013).</item>
+      <item>ENDIF.</item>
+      <item>ENDLOOP.</item>
+      <item/>
+      <item>ENDLOOP .</item>
+      <item/>
+      <item>ENDFORM.                    &quot; scan_devc_bsp</item>
+      <item/>
+      <item>FORM scan_devc_forms USING u_devc     TYPE devclass</item>
+      <item>u_index    TYPE i</item>
+      <item>u_count    TYPE i</item>
+      <item>u_cnt_line TYPE n.</item>
+      <item>DATA: l_tab_tadir     TYPE TABLE OF tadir,</item>
+      <item>l_str_tadir     TYPE tadir,</item>
+      <item>l_tab_e071      TYPE TABLE OF e071,</item>
+      <item>l_str_e071      TYPE e071,</item>
+      <item>l_str_tfdir     TYPE tfdir,</item>
+      <item>l_cnt           TYPE i,</item>
+      <item>l_cnt_str(10)   TYPE c,</item>
+      <item>l_idx_devc(10)  TYPE c,</item>
+      <item>l_cnt_devc(10)  TYPE c,</item>
+      <item>l_aux_devc(20)  TYPE c,</item>
+      <item>l_percentage    TYPE p,</item>
+      <item>l_tabix_str(10) TYPE c,</item>
+      <item>l_rep_name      TYPE sobj_name,</item>
+      <item>l_tab_source    TYPE TABLE OF t_abapsource_long,       &quot;CB</item>
+      <item>l_text          TYPE itex132,</item>
+      <item>lv_fm_name      TYPE rs38l_fnam,</item>
+      <item>lv_form_name    TYPE char30.</item>
+      <item/>
+      <item>* Initialization</item>
+      <item>l_idx_devc = u_index.</item>
+      <item>l_cnt_devc = u_count.</item>
+      <item>CONCATENATE l_idx_devc &apos;/&apos; l_cnt_devc INTO l_aux_devc.</item>
+      <item>CONDENSE l_aux_devc.</item>
+      <item/>
+      <item>* Get function pools of current package</item>
+      <item>REFRESH l_tab_tadir.</item>
+      <item>IF u_devc &lt;&gt; c_devc_tmp.</item>
+      <item>SELECT * FROM tadir INTO TABLE l_tab_tadir</item>
+      <item>WHERE pgmid    = &apos;R3TR&apos; AND</item>
+      <item>( object   = &apos;SSFO&apos; OR</item>
+      <item>object   = &apos;SFPF&apos; ) AND</item>
+      <item>devclass = u_devc AND</item>
+      <item>obj_name IN s_rest.                       &quot;#EC CI_SGLSELECT</item>
+      <item>ELSE.</item>
+      <item>SELECT * FROM tadir INTO TABLE l_tab_tadir</item>
+      <item>WHERE pgmid    = &apos;R3TR&apos; AND</item>
+      <item>( object   = &apos;SSFO&apos; OR</item>
+      <item>object   = &apos;SFPF&apos; ) AND</item>
+      <item>devclass = u_devc AND</item>
+      <item>author   = sy-uname AND</item>
+      <item>obj_name IN s_rest.                       &quot;#EC CI_SGLSELECT</item>
+      <item>ENDIF.</item>
+      <item/>
+      <item>* Ignore invalid TADIR entries.</item>
+      <item>DELETE l_tab_tadir WHERE obj_name IS INITIAL.</item>
+      <item/>
+      <item>* Write count of function pools into list</item>
+      <item>DESCRIBE TABLE l_tab_tadir LINES l_cnt.</item>
+      <item>IF l_cnt = 0.</item>
+      <item>**    FORMAT COLOR COL_NORMAL INTENSIFIED ON.</item>
+      <item>**    WRITE: / &apos;Keine Funktionsgruppen in Paket&apos;,</item>
+      <item>**             u_devc, &apos;gefunden&apos;.</item>
+      <item>EXIT.</item>
+      <item>ENDIF.</item>
+      <item>**  SKIP.</item>
+      <item>**  FORMAT COLOR COL_NORMAL INTENSIFIED ON.</item>
+      <item>**  WRITE: / &apos;Anzahl gefundener Funktionsgruppen in Paket&apos;,</item>
+      <item>**           u_devc, &apos;:&apos;, l_cnt.</item>
+      <item>**  SKIP.</item>
+      <item/>
+      <item>* Process all function pools</item>
+      <item>l_cnt_str = l_cnt.</item>
+      <item>CONDENSE l_cnt_str.</item>
+      <item>LOOP AT l_tab_tadir INTO l_str_tadir.</item>
+      <item>l_tabix_str = sy-tabix.</item>
+      <item>CONDENSE l_tabix_str.</item>
+      <item/>
+      <item>*   Display progress indicator</item>
+      <item>l_percentage = 100 * ( sy-tabix / l_cnt ).</item>
+      <item>CONCATENATE &apos;Scanne Paket&apos;(008) u_devc l_aux_devc</item>
+      <item>&apos;(&apos; &apos;FuGr&apos;(011) l_tabix_str &apos;von&apos;(010) l_cnt_str &apos;)&apos;</item>
+      <item>INTO l_text SEPARATED BY space.</item>
+      <item>CALL FUNCTION &apos;SAPGUI_PROGRESS_INDICATOR&apos;</item>
+      <item>EXPORTING</item>
+      <item>percentage = l_percentage</item>
+      <item>text       = l_text.</item>
+      <item/>
+      <item>CLEAR: lv_fm_name, lv_form_name.</item>
+      <item/>
+      <item>lv_form_name = l_str_tadir-obj_name.</item>
+      <item/>
+      <item>CASE l_str_tadir-object.</item>
+      <item>WHEN &apos;SSFO&apos;.</item>
+      <item>CALL FUNCTION &apos;SSF_FUNCTION_MODULE_NAME&apos;</item>
+      <item>EXPORTING</item>
+      <item>formname           = lv_form_name</item>
+      <item>IMPORTING</item>
+      <item>fm_name            = lv_fm_name</item>
+      <item>EXCEPTIONS</item>
+      <item>no_form            = 1</item>
+      <item>no_function_module = 2</item>
+      <item>OTHERS             = 3.</item>
+      <item>IF sy-subrc &lt;&gt; 0.</item>
+      <item>CONTINUE.</item>
+      <item>ENDIF.</item>
+      <item/>
+      <item>WHEN &apos;SFPF&apos;.</item>
+      <item>TRY.</item>
+      <item>CALL FUNCTION &apos;FP_FUNCTION_MODULE_NAME&apos;</item>
+      <item>EXPORTING</item>
+      <item>i_name     = lv_form_name</item>
+      <item>IMPORTING</item>
+      <item>e_funcname = lv_fm_name.</item>
+      <item>CATCH cx_fp_api_repository.</item>
+      <item>continue.</item>
+      <item>CATCH cx_fp_api_usage.</item>
+      <item>continue.</item>
+      <item>CATCH cx_fp_api_internal.</item>
+      <item>continue.</item>
+      <item>ENDTRY.</item>
+      <item/>
+      <item>IF lv_fm_name IS INITIAL.</item>
+      <item>CONTINUE.</item>
+      <item>ENDIF.</item>
+      <item/>
+      <item>ENDCASE.</item>
+      <item/>
+      <item/>
+      <item/>
+      <item>*   Get function pool objects</item>
+      <item>*    write: / l_str_tadir-obj_name.</item>
+      <item>l_str_e071-pgmid    = l_str_tadir-pgmid.</item>
+      <item>l_str_e071-object   = l_str_tadir-object.</item>
+      <item>l_str_e071-obj_name = lv_fm_name.</item>
+      <item>REFRESH l_tab_e071.</item>
+      <item>CALL FUNCTION &apos;STOR_RESOLVE_FUGR&apos;</item>
+      <item>EXPORTING</item>
+      <item>is_e071 = l_str_e071</item>
+      <item>TABLES</item>
+      <item>tt_e071 = l_tab_e071</item>
+      <item>EXCEPTIONS</item>
+      <item>OTHERS  = 0.</item>
+      <item/>
+      <item>*   Read basis program sources and search for specified strings</item>
+      <item>LOOP AT l_tab_e071 INTO l_str_e071 WHERE object = &apos;REPO&apos; .</item>
+      <item>l_rep_name = l_str_e071-obj_name.</item>
+      <item>REFRESH l_tab_source.</item>
+      <item>READ REPORT l_rep_name INTO l_tab_source.</item>
+      <item>IF sy-subrc = 0.</item>
+      <item>PERFORM scan_prog USING    u_devc</item>
+      <item>l_rep_name</item>
+      <item>u_cnt_line</item>
+      <item>CHANGING l_tab_source.       &quot;CB</item>
+      <item>**      ELSE.</item>
+      <item>**        FORMAT COLOR COL_NEGATIVE.</item>
+      <item>**        WRITE: / &apos;Report&apos;, l_rep_name, &apos;nicht gefunden!&apos;.</item>
+      <item>ENDIF.</item>
+      <item>ENDLOOP .</item>
+      <item/>
+      <item>* (A) Keine generierten Dialoge?!? Das sollte man evtl. optional</item>
+      <item>*     anbieten (Zeitpunkt-Routinen!)</item>
+      <item>*   Read function module sources and search for specified strings</item>
+      <item>LOOP AT l_tab_e071 INTO l_str_e071 WHERE object = &apos;FUNC&apos; .</item>
+      <item>IF l_str_e071-obj_name(4) = &apos;VIEW&apos;. &quot;Keine gen. Dialoge</item>
+      <item>CONTINUE.</item>
+      <item>ENDIF.</item>
+      <item>SELECT SINGLE * FROM tfdir INTO l_str_tfdir</item>
+      <item>WHERE funcname = l_str_e071-obj_name.         &quot;#EC CI_SGLSELECT</item>
+      <item>IF sy-subrc = 0.</item>
+      <item>CONCATENATE l_str_tfdir-pname &apos;U&apos; l_str_tfdir-include</item>
+      <item>INTO l_rep_name.</item>
+      <item>REPLACE &apos;SAPL&apos; WITH &apos;L&apos; INTO l_rep_name.</item>
+      <item>REFRESH l_tab_source.</item>
+      <item>READ REPORT l_rep_name INTO l_tab_source.</item>
+      <item>IF sy-subrc = 0.</item>
+      <item>PERFORM scan_prog USING    u_devc</item>
+      <item>l_rep_name</item>
+      <item>u_cnt_line</item>
+      <item>CHANGING l_tab_source.     &quot;CB</item>
+      <item>**        ELSE.</item>
+      <item>**          FORMAT COLOR COL_NEGATIVE.</item>
+      <item>**          WRITE: / &apos;Report&apos;, l_rep_name, &apos;nicht gefunden!&apos;.</item>
+      <item>ENDIF.</item>
+      <item>ENDIF.</item>
+      <item>ENDLOOP.</item>
+      <item>ENDLOOP .</item>
+      <item/>
+      <item>ENDFORM.                    &quot; scan_devc_forms</item>
+      <item>form enhanced_scan USING u_devc         TYPE devclass</item>
+      <item>u_index        TYPE i</item>
+      <item>u_count        TYPE i</item>
+      <item>u_cnt_line     TYPE n.</item>
+      <item>IF p_enh = con_true.</item>
+      <item>PERFORM scan_devc_enh</item>
+      <item>USING u_devc u_index u_count u_cnt_line.</item>
+      <item>ENDIF.</item>
+      <item>IF p_wdy = con_true.</item>
+      <item>PERFORM scan_devc_wdy</item>
+      <item>USING u_devc u_index u_count u_cnt_line.</item>
+      <item>ENDIF.</item>
+      <item>IF p_bsp = con_true.</item>
+      <item>PERFORM scan_devc_bsp</item>
+      <item>USING u_devc u_index u_count u_cnt_line.</item>
+      <item>ENDIF.</item>
+      <item>IF p_frm = con_true.</item>
+      <item>PERFORM scan_devc_forms</item>
+      <item>USING u_devc u_index u_count u_cnt_line.</item>
+      <item>ENDIF.</item>
+      <item>endform.</item>
+     </SOURCE>
+    </ENH_HOOK_IMPL>
+   </ENHANCEMENTS>
+   <SPACES>
+    <item>
+     <FULL_NAME>\PR:AFX_CODE_SCANNER\FO:SCAN_DEVC\SE:END\EI</FULL_NAME>
+     <SPACES>
+      <item>0</item>
+     </SPACES>
+    </item>
+    <item>
+     <FULL_NAME>\PR:AFX_CODE_SCANNER\IC:AFX_CODE_SCANNER\SE:END\EI</FULL_NAME>
+     <SPACES>
+      <item>0</item>
+      <item>2</item>
+      <item>14</item>
+      <item>14</item>
+      <item>14</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>2</item>
+      <item>2</item>
+      <item>2</item>
+      <item>2</item>
+      <item>0</item>
+      <item>2</item>
+      <item>2</item>
+      <item>2</item>
+      <item>0</item>
+      <item>2</item>
+      <item>2</item>
+      <item>2</item>
+      <item>0</item>
+      <item>2</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>26</item>
+      <item>26</item>
+      <item>26</item>
+      <item>2</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>2</item>
+      <item>2</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>2</item>
+      <item>4</item>
+      <item>6</item>
+      <item>12</item>
+      <item>12</item>
+      <item>12</item>
+      <item>0</item>
+      <item>2</item>
+      <item>4</item>
+      <item>6</item>
+      <item>12</item>
+      <item>12</item>
+      <item>12</item>
+      <item>12</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>4</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>2</item>
+      <item>2</item>
+      <item>4</item>
+      <item>4</item>
+      <item>0</item>
+      <item>0</item>
+      <item>4</item>
+      <item>4</item>
+      <item>16</item>
+      <item>16</item>
+      <item>4</item>
+      <item>6</item>
+      <item>8</item>
+      <item>8</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>4</item>
+      <item>6</item>
+      <item>6</item>
+      <item>5</item>
+      <item>0</item>
+      <item>4</item>
+      <item>0</item>
+      <item>4</item>
+      <item>4</item>
+      <item>4</item>
+      <item>6</item>
+      <item>33</item>
+      <item>33</item>
+      <item>24</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>4</item>
+      <item>0</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>26</item>
+      <item>26</item>
+      <item>26</item>
+      <item>0</item>
+      <item>2</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>2</item>
+      <item>2</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>2</item>
+      <item>4</item>
+      <item>6</item>
+      <item>12</item>
+      <item>12</item>
+      <item>12</item>
+      <item>0</item>
+      <item>2</item>
+      <item>4</item>
+      <item>6</item>
+      <item>12</item>
+      <item>12</item>
+      <item>12</item>
+      <item>12</item>
+      <item>2</item>
+      <item>0</item>
+      <item>2</item>
+      <item>2</item>
+      <item>4</item>
+      <item>6</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>8</item>
+      <item>7</item>
+      <item>10</item>
+      <item>3</item>
+      <item>7</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>0</item>
+      <item>4</item>
+      <item>6</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>8</item>
+      <item>7</item>
+      <item>10</item>
+      <item>3</item>
+      <item>7</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>13</item>
+      <item>4</item>
+      <item>0</item>
+      <item>0</item>
+      <item>4</item>
+      <item>4</item>
+      <item>20</item>
+      <item>0</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>4</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>2</item>
+      <item>2</item>
+      <item>4</item>
+      <item>4</item>
+      <item>0</item>
+      <item>0</item>
+      <item>4</item>
+      <item>4</item>
+      <item>16</item>
+      <item>16</item>
+      <item>4</item>
+      <item>6</item>
+      <item>8</item>
+      <item>8</item>
+      <item>0</item>
+      <item>4</item>
+      <item>4</item>
+      <item>4</item>
+      <item>4</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>4</item>
+      <item>6</item>
+      <item>8</item>
+      <item>6</item>
+      <item>8</item>
+      <item>6</item>
+      <item>8</item>
+      <item>8</item>
+      <item>0</item>
+      <item>4</item>
+      <item>0</item>
+      <item>4</item>
+      <item>4</item>
+      <item>0</item>
+      <item>4</item>
+      <item>4</item>
+      <item>4</item>
+      <item>4</item>
+      <item>4</item>
+      <item>0</item>
+      <item>4</item>
+      <item>6</item>
+      <item>0</item>
+      <item>6</item>
+      <item>0</item>
+      <item>6</item>
+      <item>6</item>
+      <item>8</item>
+      <item>35</item>
+      <item>35</item>
+      <item>26</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>6</item>
+      <item>4</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>27</item>
+      <item>27</item>
+      <item>27</item>
+      <item>2</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>2</item>
+      <item>2</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>2</item>
+      <item>4</item>
+      <item>6</item>
+      <item>12</item>
+      <item>12</item>
+      <item>12</item>
+      <item>2</item>
+      <item>4</item>
+      <item>6</item>
+      <item>12</item>
+      <item>12</item>
+      <item>12</item>
+      <item>12</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>2</item>
+      <item>2</item>
+      <item>4</item>
+      <item>4</item>
+      <item>0</item>
+      <item>0</item>
+      <item>4</item>
+      <item>4</item>
+      <item>16</item>
+      <item>16</item>
+      <item>4</item>
+      <item>6</item>
+      <item>8</item>
+      <item>8</item>
+      <item>0</item>
+      <item>0</item>
+      <item>4</item>
+      <item>4</item>
+      <item>6</item>
+      <item>8</item>
+      <item>8</item>
+      <item>6</item>
+      <item>8</item>
+      <item>11</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>4</item>
+      <item>0</item>
+      <item>4</item>
+      <item>0</item>
+      <item>6</item>
+      <item>6</item>
+      <item>6</item>
+      <item>6</item>
+      <item>6</item>
+      <item>0</item>
+      <item>6</item>
+      <item>16</item>
+      <item>0</item>
+      <item>4</item>
+      <item>0</item>
+      <item>4</item>
+      <item>6</item>
+      <item>6</item>
+      <item>6</item>
+      <item>6</item>
+      <item>0</item>
+      <item>6</item>
+      <item>8</item>
+      <item>35</item>
+      <item>35</item>
+      <item>26</item>
+      <item>6</item>
+      <item>8</item>
+      <item>8</item>
+      <item>6</item>
+      <item>4</item>
+      <item>0</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>26</item>
+      <item>26</item>
+      <item>26</item>
+      <item>2</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>2</item>
+      <item>2</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>2</item>
+      <item>4</item>
+      <item>6</item>
+      <item>12</item>
+      <item>14</item>
+      <item>12</item>
+      <item>12</item>
+      <item>2</item>
+      <item>4</item>
+      <item>6</item>
+      <item>12</item>
+      <item>14</item>
+      <item>12</item>
+      <item>12</item>
+      <item>12</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>4</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>2</item>
+      <item>2</item>
+      <item>2</item>
+      <item>4</item>
+      <item>4</item>
+      <item>0</item>
+      <item>0</item>
+      <item>4</item>
+      <item>4</item>
+      <item>16</item>
+      <item>16</item>
+      <item>4</item>
+      <item>6</item>
+      <item>8</item>
+      <item>8</item>
+      <item>0</item>
+      <item>4</item>
+      <item>0</item>
+      <item>4</item>
+      <item>0</item>
+      <item>4</item>
+      <item>6</item>
+      <item>8</item>
+      <item>10</item>
+      <item>12</item>
+      <item>10</item>
+      <item>12</item>
+      <item>10</item>
+      <item>12</item>
+      <item>12</item>
+      <item>12</item>
+      <item>8</item>
+      <item>10</item>
+      <item>8</item>
+      <item>0</item>
+      <item>6</item>
+      <item>8</item>
+      <item>12</item>
+      <item>14</item>
+      <item>16</item>
+      <item>14</item>
+      <item>16</item>
+      <item>10</item>
+      <item>12</item>
+      <item>10</item>
+      <item>12</item>
+      <item>10</item>
+      <item>12</item>
+      <item>8</item>
+      <item>0</item>
+      <item>8</item>
+      <item>10</item>
+      <item>8</item>
+      <item>0</item>
+      <item>4</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>4</item>
+      <item>4</item>
+      <item>4</item>
+      <item>4</item>
+      <item>4</item>
+      <item>6</item>
+      <item>8</item>
+      <item>6</item>
+      <item>8</item>
+      <item>6</item>
+      <item>8</item>
+      <item>0</item>
+      <item>0</item>
+      <item>4</item>
+      <item>6</item>
+      <item>6</item>
+      <item>6</item>
+      <item>6</item>
+      <item>8</item>
+      <item>35</item>
+      <item>35</item>
+      <item>26</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>6</item>
+      <item>4</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>4</item>
+      <item>6</item>
+      <item>8</item>
+      <item>6</item>
+      <item>6</item>
+      <item>8</item>
+      <item>6</item>
+      <item>8</item>
+      <item>20</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>8</item>
+      <item>10</item>
+      <item>37</item>
+      <item>37</item>
+      <item>28</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>8</item>
+      <item>6</item>
+      <item>4</item>
+      <item>2</item>
+      <item>0</item>
+      <item>0</item>
+      <item>0</item>
+      <item>25</item>
+      <item>25</item>
+      <item>25</item>
+      <item>2</item>
+      <item>4</item>
+      <item>6</item>
+      <item>2</item>
+      <item>2</item>
+      <item>4</item>
+      <item>6</item>
+      <item>2</item>
+      <item>2</item>
+      <item>4</item>
+      <item>6</item>
+      <item>2</item>
+      <item>2</item>
+      <item>4</item>
+      <item>6</item>
+      <item>2</item>
+      <item>0</item>
+     </SPACES>
+    </item>
+   </SPACES>
+  </asx:values>
+ </asx:abap>
+</abapGit>
