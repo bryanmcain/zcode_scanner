@@ -17,6 +17,8 @@ INITIALIZATION.
 
   "default typical namespace for customer and output routines
   s_devc-low = 'Z*'.
+  s_devc-sign = 'I'.
+  s_devc-option = 'CP'.
   APPEND s_devc.
 
   s_devc-option = 'EQ'.
